@@ -38,26 +38,35 @@ const getNotes = async (req, res) => {
 };
 
 const updateNote = async (req, res) => {
-  const {id} = req.params
-  const {description} = req.body
-  
-  if(!mongoose.Types.ObjectId.isValid(id))
-    return res.status(400).json({error:"please provide valid ID for notes"})
-  if(!description || description.trim().length < 10)
-    return res.status(400).json({error: 'description must be atleast 10 charecters long'})
-    
-    const note =await NoteModel.findById(id)
-    if(!note)
-        return res.status(404).json({error:'note not found'})
-    
-    note.description = description
-    await note.save()
-    
-    return res.status(200).json({message:"note updated successfully",note})
+  const { id } = req.params;
+  const { description } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(400).json({ error: "please provide valid ID for notes" });
+  if (!description || description.trim().length < 10)
+    return res
+      .status(400)
+      .json({ error: "description must be atleast 10 charecters long" });
+
+  const note = await NoteModel.findById(id);
+  if (!note) return res.status(404).json({ error: "note not found" });
+
+  note.description = description;
+  await note.save();
+
+  return res.status(200).json({ message: "note updated successfully", note });
 };
 
 const deleteNote = async (req, res) => {
-  return;
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(400).json({ error: "invalid id " });
+
+  const note = await NoteModel.findById(id);
+  if (!note) return res.status(404).json({ error: "note not found" });
+  
+  await NoteModel.findByIdAndDelete(id)
+  res.status(200).json({message:"note deleted successfully"})
 };
 
 export { createNote, getNotes, updateNote, deleteNote };
