@@ -1,8 +1,13 @@
-import express from 'express'
+import express from "express";
 
-const app = express()
+import authRoutes  from "./routes/auth.routes.js";
+import noteRoutes from './routes/note.routes.js'
 
-app.use(express.json())
+const app = express();
 
+app.use(express.json());
 
-export default app
+app.use("api/notes", authRoutes);
+app.use("api/notes", noteRoutes);
+
+export default app;
