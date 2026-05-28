@@ -17,6 +17,7 @@ const createNote =async(req,res) =>{
         res.status(400).json({error:"Description must be atleast 10 charecters long"})
     
     const newNote = await NoteModel.create()
+    return res.status(201).json({messge: "Note created successfully", note: newNote})
     
 }
 
