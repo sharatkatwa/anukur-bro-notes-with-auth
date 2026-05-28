@@ -4,10 +4,13 @@ import mongoose from "mongoose";
 
 const createNote = async (req, res) => {
   const { title, description } = req.body;
+
+  // Read and verify the JWT stored in cookies so the note can be linked to the logged-in user.
   const token = req.cookies.token;
   const user = jwt.verify(token, process.env.JWT_SECRET);
-
   req.user = user;
+
+  // Validate required fields before creating a note in the database.
   if (!title) return res.status(400).json({ error: "Title is required" });
   if (!description)
     return res.status(400).json({ error: "description is required" });
@@ -20,6 +23,7 @@ const createNote = async (req, res) => {
       .status(400)
       .json({ error: "Description must be atleast 10 charecters long" });
 
+  // Create the note document after all input checks have passed.
   const newNote = await NoteModel.create();
   return res
     .status(201)
@@ -27,10 +31,11 @@ const createNote = async (req, res) => {
 };
 
 const getNotes = async (req, res) => {
+  // Verify the cookie token and use the email from it to fetch only this user's notes.
   const token = req.cookies.token;
   const user = jwt.verify(token, process.env.JWT_SECRET);
-
   req.user = user;
+
   const notes = await NoteModel.find({ user: req.user.email });
   if (!notes) return res.status(404).json({ message: "Notes not found" });
 
@@ -41,13 +46,17 @@ const updateNote = async (req, res) => {
   const { id } = req.params;
   const { description } = req.body;
 
+  // Make sure the route parameter is a valid MongoDB ObjectId before querying.
   if (!mongoose.Types.ObjectId.isValid(id))
     return res.status(400).json({ error: "please provide valid ID for notes" });
+
+  // Only allow meaningful descriptions to be saved.
   if (!description || description.trim().length < 10)
     return res
       .status(400)
       .json({ error: "description must be atleast 10 charecters long" });
 
+  // Load the existing note, update its description, then save the modified document.
   const note = await NoteModel.findById(id);
   if (!note) return res.status(404).json({ error: "note not found" });
 
@@ -59,9 +68,12 @@ const updateNote = async (req, res) => {
 
 const deleteNote = async (req, res) => {
   const { id } = req.params;
+
+  // Validate the id first so invalid values do not reach the database query.
   if (!mongoose.Types.ObjectId.isValid(id))
     return res.status(400).json({ error: "invalid id " });
 
+  // Confirm the note exists before deleting it.
   const note = await NoteModel.findById(id);
   if (!note) return res.status(404).json({ error: "note not found" });
   
