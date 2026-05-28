@@ -18,10 +18,12 @@ const register = async (req, res) => {
     { expiresIn: "1h" },
   );
   res.cookie("token", token);
-  
-  res.status(201).json({message:"user registered successfully",user})
+
+  res.status(201).json({ message: "user registered successfully", user });
 };
 
-const login = async (req, res) => {};
+const login = async (req, res) => {
+
+};
 
 export { register, login };
