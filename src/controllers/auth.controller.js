@@ -19,7 +19,7 @@ const register = async (req, res) => {
   );
   res.cookie("token", token);
 
-  res.status(201).json({ message: "user registered successfully", user });
+  return res.status(201).json({ message: "user registered successfully", user });
 };
 
 const login = async (req, res) => {
